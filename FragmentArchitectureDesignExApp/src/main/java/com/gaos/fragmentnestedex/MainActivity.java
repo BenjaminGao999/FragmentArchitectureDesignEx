@@ -25,5 +25,4 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().beginTransaction().add(R.id.fragmnet_container, new FragmentA()).commit();
     }
-
 }

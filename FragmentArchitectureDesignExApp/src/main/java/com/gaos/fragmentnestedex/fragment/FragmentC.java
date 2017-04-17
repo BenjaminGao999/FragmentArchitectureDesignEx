@@ -1,6 +1,7 @@
 package com.gaos.fragmentnestedex.fragment;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,11 @@ public class FragmentC extends BaseFragment {
         btnBackC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().popBackStack();
+//                getActivity().getSupportFragmentManager().popBackStack();
+                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                clearAllFragmentTransaction();
+
+//                goToFragmentWithoutBackStack(new FragmentB());
             }
         });
     }

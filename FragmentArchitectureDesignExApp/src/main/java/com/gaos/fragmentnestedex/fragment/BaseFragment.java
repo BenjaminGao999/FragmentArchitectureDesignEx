@@ -1,11 +1,17 @@
 package com.gaos.fragmentnestedex.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.gaos.fragmentnestedex.R;
 
 /**
  * Author:　Created by benjamin
@@ -52,5 +58,25 @@ public abstract class BaseFragment extends Fragment {
         ViewGroup parent = (ViewGroup) getView().getParent();
         parent.removeView(getView());
         mIsOnCreateExcute = false;
+    }
+
+    protected void goToFragment(BaseFragment fragment) {
+        if (getActivity() == null) return;
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_from_right, R.anim.slide_to_left, R.anim.slide_from_left, R.anim.slide_to_right);
+        transaction.addToBackStack(null).replace(R.id.fragmnet_container, fragment, null).commit();
+    }
+
+    protected void goToFragmentWithoutBackStack(BaseFragment fragment) {
+        if (getActivity() == null) return;
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_from_right, R.anim.slide_to_left, R.anim.slide_from_left, R.anim.slide_to_right);
+        transaction.replace(R.id.fragmnet_container, fragment, null).commit();
+    }
+
+
+    protected void clearAllFragmentTransaction() {
+        if (getActivity() == null) return;
+        for (int i = 0; i < getActivity().getSupportFragmentManager().getBackStackEntryCount(); i++) {
+            getActivity().getSupportFragmentManager().popBackStack();
+        }
     }
 }

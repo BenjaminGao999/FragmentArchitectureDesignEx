@@ -55,6 +55,19 @@ public class FragmentA extends Fragment {
     }
 }
 
+4)清空transaction backStack
+方法①
+    FragmentManager fm = getActivity().getSupportFragmentManager();
+    for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+        fm.popBackStack();
+    }
+方法②
+    But could equally have used something like:
+    FragmentManager.popBackStack(String name, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
+5)清空所有Fragment，并打开一个新的Fragment
+
+
 5、管理Activity的生命周期
 https://developer.android.google.cn/training/basics/activity-lifecycle/index.html
 
