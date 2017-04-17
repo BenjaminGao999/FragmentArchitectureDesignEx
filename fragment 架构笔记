@@ -1,0 +1,126 @@
+1、fragment结合viewPager的用法
+2、fragment结合FragmentTabHost
+https://developer.android.google.cn/reference/android/support/v4/app/FragmentTabHost.html
+3、Fragment培训
+https://developer.android.google.cn/training/basics/fragments/fragment-ui.html#AddAtRuntime
+
+4、Build a Dynamic UI with Fragments
+https://developer.android.google.cn/training/basics/fragments/index.html
+
+1)Fragments
+https://developer.android.google.cn/guide/components/fragments.html
+
+需要认真讨论的要点：
+将片段添加到 Activity 返回栈时如何保持其状态、如何与 Activity 及 Activity 中的其他片段共享事件
+
+2)Fragment状态保存
+替换片段的步骤与添加片段类似，只不过调用的方法从 add() 改为 replace()。
+
+请谨记，当您执行替换或移除片段等片段事务时，通常最好让用户能够回退并“撤消”更改。 要让用户回退所执行的片段事务，您必须先调用 addToBackStack()，然后再提交 FragmentTransaction。
+
+注：当您移除或替换一个片段并向返回栈添加事务时，系统会停止（而非销毁）移除的片段。 如果用户执行回退操作进行片段恢复，该片段将重新启动。 如果您不向返回栈添加事务，则系统会在您移除或替换片段时将其销毁。
+
+3)stackOverFlow Fragment状态保存
+http://stackoverflow.com/questions/11353075/how-can-i-maintain-fragment-state-when-added-to-the-back-stack
+①
+If you return to a fragment from the back stack it does not re-create the fragment but re-uses the same instance and starts with onCreateView() in the fragment lifecycle, see Fragment lifecycle.
+So if you want to store state you should use instance variables（实例变量） and not rely on onSaveInstanceState().
+②
+public class FragmentA extends Fragment {
+    View _rootView;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        if (_rootView == null) {
+            // Inflate the layout for this fragment
+            _rootView = inflater.inflate(R.layout.fragment_a, container, false);
+            // Find and setup subviews
+            _listView = (ListView)_rootView.findViewById(R.id.listView);
+            ...
+        } else {
+            // Do not inflate the layout again.
+            // The returned View of onCreateView will be added into the fragment.
+            // However it is not allowed to be added twice even if the parent is same.
+            // So we must remove _rootView from the existing parent view group
+            // in onDestroyView() (it will be added back).
+        }
+        return _rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (_rootView.getParent() != null) {
+            ((ViewGroup)_rootView.getParent()).removeView(_rootView);
+        }
+        super.onDestroyView();
+    }
+}
+
+5、管理Activity的生命周期
+https://developer.android.google.cn/training/basics/activity-lifecycle/index.html
+
+  ① 实例和状态完整保留
+
+  Activity 只能在三种状态之一下存在很长时间。
+
+  继续
+  在这种状态下，Activity 处于前台，且用户可以与其交互。（有时也称为“运行”状态。）
+  暂停
+  在这种状态下，Activity 被在前台中处于半透明状态或者未覆盖整个屏幕的另一个 Activity—部分阻挡。
+  暂停的 Activity 不会接收用户输入并且无法执行任何代码。
+  停止
+  在这种状态下，Activity 被完全隐藏并且对用户不可见；它被视为处于后台。
+   停止时，Activity 实例及其诸如成员变量等所有状态信息将保留，但它无法执行任何代码。
+
+  ② 启动Activity
+https://developer.android.google.cn/training/basics/activity-lifecycle/starting.html#Destroy
+
+您可以在 Android 清单文件 AndroidManifest.xml 中定义哪个 Activity 用作主 Activity，该文件位于您项目目录的根目录中。
+
+您的应用的主 Activity 必须使用 <intent-filter>（包括 MAIN 操作和 LAUNCHER 类别）在清单文件中声明。例如：
+
+<activity android:name=".MainActivity" android:label="@string/app_name">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+注：当您使用 Android SDK工具创建新 Android 项目时，默认的项目文件包括使用过滤器在宣示说明中声明的 Activity 类。
+
+如果未对您的 Activity 之一声明 MAIN 操作或 LAUNCHER 类别，那么您的应用图标将不会出现在应用的主屏幕列表中。
+
+  ③ <intent-filter/>的作用？
+        说明当前组件的功能和等级。<action/>指明功能，<category/>指明等级（同一功能,用不同等级来区分，例如接收有序广播）
+
+   ④ 当 Activity 的第一个生命周期回调是 onCreate() 时，它最近的回调是 onDestroy()。
+   系统会对您的 Activity 调用此方法，作为您的 Activity 实例完全从系统内存移除的最终信号。
+注：在所有情况下，系统在调用 onPause() 和 onStop() 之后都会调用 onDestroy()，
+只有一个例外：当您从 onCreate() 方法内调用 finish() 时。在某些情况下，比如当您的 Activity 作为临时决策工具运行以启动另一个 Activity 时，
+您可从 onCreate() 内调用 finish() 来销毁 Activity。在这种情况下，系统会立刻调用 onDestroy()，而不调用任何其他 生命周期方法。
+
+③ 重新创建Activity
+https://developer.android.google.cn/training/basics/activity-lifecycle/recreating.html#RestoreState
+
+当您的 Activity 因用户按了返回 或 Activity 自行完成而被销毁时，系统的 Activity 实例概念将永久消失，因为行为指示不再需要 Activity。
+ 但是，如果系统因系统局限性（而非正常应用行为）而销毁 Activity，尽管 Activity 实际实例已不在，系统会记住其存在，这样，如果用户导航回实例，
+ 系统会使用描述 Activity 被销毁时状态的一组已保存数据创建 Activity 的新实例。
+系统用于恢复先前状态的已保存数据被称为“实例状态”，并且是 Bundle 对象中存储的键值对集合。
+
+默认情况下，系统会使用 Bundle 实例状态保存您的 Activity 布局（比如，输入到 EditText 对象中的文本值）中有关每个 View 对象的信息。
+ 这样，如果您的 Activity 实例被销毁并重新创建，布局状态便恢复为其先前的状态，且您无需代码。
+但是，您的 Activity 可能具有您要恢复的更多状态信息，比如跟踪用户在 Activity 中进度的成员变量。
+
+注：为了 Android 系统恢复 Activity 中视图的状态，每个视图必须具有 android:id 属性提供的唯一 ID。
+
+注意：每次用户旋转屏幕时，您的 Activity 将被销毁并重新创建。
+当屏幕方向变化时，系统会销毁并重新创建前台 Activity，因为屏幕配置已更改并且您的 Activity 可能需要加载备用资源（比如布局）。
+
+要保存有关 Activity 状态的其他数据，您必须替代 onSaveInstanceState() 回调方法。
+当用户要离开 Activity 并在 Activity 意外销毁时向其传递将保存的 Bundle 对象时，系统会调用此方法。
+ 如果系统必须稍后重新创建 Activity 实例，它会将相同的 Bundle 对象同时传递给 onRestoreInstanceState() 和 onCreate() 方法。
+
+④ 暂停和继续
+https://developer.android.google.cn/training/basics/activity-lifecycle/pausing.html
+
+
+⑤ 停止和重启Activity
+https://developer.android.google.cn/training/basics/activity-lifecycle/stopping.html
