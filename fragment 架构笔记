@@ -137,3 +137,16 @@ https://developer.android.google.cn/training/basics/activity-lifecycle/pausing.h
 
 ⑤ 停止和重启Activity
 https://developer.android.google.cn/training/basics/activity-lifecycle/stopping.html
+
+
+5、Fragment生命周期执行时机
+1）
+一旦 Activity 达到恢复状态，您就可以随意向 Activity 添加片段和移除其中的片段。
+因此，只有当 Activity 处于恢复状态时，片段的生命周期才能独立变化。
+
+2）片段所在的 Activity 的生命周期会直接影响片段的生命周期，其表现为，Activity 的每次生命周期回调都会引发每个片段的类似回调。
+例如，当 Activity 收到 onPause() 时，Activity 中的每个片段也会收到 onPause()。
+
+3）不过，片段还有几个额外的生命周期回调，用于处理与 Activity 的唯一交互，以执行构建和销毁片段 UI 等操作。
+
+
